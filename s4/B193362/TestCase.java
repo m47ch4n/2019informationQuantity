@@ -107,21 +107,27 @@ public class TestCase {
 	try {
 	    InformationEstimatorInterface myObject;
 	    double value;
+      boolean ok = true;
 	    System.out.println("checking s4.B193362.InformationEstimator.estimation() estimation of information quantity");
 	    myObject = new s4.B193362.InformationEstimator();
 	    myObject.setSpace("3210321001230123".getBytes());
 	    myObject.setTarget("0".getBytes());
 	    value = myObject.estimation();
 	    System.out.println(">0 "+value);
+      ok = ok && Double.compare(value, 2.0) == 0;
 	    myObject.setTarget("01".getBytes());
 	    value = myObject.estimation();
 	    System.out.println(">01 "+value);
+      ok = ok && Double.compare(value, 3.0) == 0;
 	    myObject.setTarget("0123".getBytes());
 	    value = myObject.estimation();
 	    System.out.println(">0123 "+value);
+      ok = ok && Double.compare(value, 3.0) == 0;
 	    myObject.setTarget("00".getBytes());
 	    value = myObject.estimation();
 	    System.out.println(">00 "+value);
+      ok = ok && Double.compare(value, 4.0) == 0;
+	    if(ok) { System.out.println("OK"); } else {System.out.println("WRONG"); }
 	}
 	catch(Exception e) {
 	    System.out.println("Exception occurred: STOP");
