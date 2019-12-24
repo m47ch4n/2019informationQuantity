@@ -77,6 +77,20 @@ public class TestCase {
 	try {
 	    FrequencerInterface  myObject;
 	    int freq;
+	    System.out.println("checking s4.B193362.Frequencer.frequency() do not throw ArrayIndexOutOfBoundsException");
+	    myObject = new s4.B193362.Frequencer();
+	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
+	    myObject.setTarget("H".getBytes());
+	    freq = myObject.frequency();
+	    System.out.println("OK");
+	}
+	catch(Exception e) {
+      System.out.println("WRONG");
+	}
+
+	try {
+	    FrequencerInterface  myObject;
+	    int freq;
 	    System.out.println("checking s4.B193362.Frequencer.subByteFrequency() get the frequency of subByte of taget");
 	    myObject = new s4.B193362.Frequencer();
 	    myObject.setSpace("Hi Ho Hi Ho".getBytes());
