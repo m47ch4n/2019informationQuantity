@@ -2,7 +2,7 @@ package s4.B193362; // Please modify to s4.Bnnnnnn, where nnnnnn is your student
 
 import java.lang.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*; 
+import java.util.*;
 
 import s4.specification.*;
 
@@ -24,12 +24,15 @@ public class Frequencer implements FrequencerInterface {
 
     class Suffix implements Comparable<Suffix> {
         private int value;
+
         public Suffix(int v) {
             this.value = v;
         }
-        public int compareTo(Suffix sai) { 
+
+        public int compareTo(Suffix sai) {
             return suffixCompare(this.value, sai.value);
-        } 
+        }
+
         public int getValue() {
             return this.value;
         }
@@ -103,6 +106,9 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここに、int suffixArrayをソートするコードを書け。
         // 順番はsuffixCompareで定義されるものとする。
+
+        // Java の Comparable クラスを実装した Suffix クラスで suffix_array を構成しているため、
+        // マージソートベースの O(nlog n) の Collections.sort メソッドが使用できる
         Collections.sort(suffixArray);
     }
 
@@ -137,7 +143,6 @@ public class Frequencer implements FrequencerInterface {
         int last = subByteEndIndex(start, end);
         return last - first;
     }
-    // 変更してはいけないコードはここまで。
 
     private int targetCompare(int i, int j, int k) {
         // suffixArrayを探索するときに使う比較関数。
@@ -167,11 +172,37 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここに比較のコードを書け
         //
-        String str_i = new String(suffix_i, StandardCharsets.UTF_8)
-                            .substring(0, Math.min(suffix_i.length, target_i_k.length));
+        String str_i = new String(suffix_i, StandardCharsets.UTF_8).substring(0,
+                Math.min(suffix_i.length, target_i_k.length));
         String str_i_k = new String(target_i_k, StandardCharsets.UTF_8);
         int result = str_i.compareTo(str_i_k);
         return result < 0 ? -1 : result > 0 ? 1 : 0;
+    }
+
+    private int binarySearch(int l, int r, int start, int end) {
+        if (r >= l) {
+            int mid = l + (r - l) / 2;
+
+            // If the element is present at the
+            // middle itself
+            int compared = targetCompare(suffixArray.get(mid).getValue(), start, end);
+
+            if (compared == 0)
+                return mid;
+
+            // If element is smaller than mid, then
+            // it can only be present in left subarray
+            if (compared < 0)
+                return binarySearch(l, mid - 1, start, end);
+
+            // Else the element can only be present
+            // in right subarray
+            return binarySearch(mid + 1, r, start, end);
+        }
+
+        // We reach here when element is not present
+        // in array
+        return -1;
     }
 
     private int subByteStartIndex(int start, int end) {
@@ -191,12 +222,11 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここにコードを記述せよ。
         //
-        for (int i = 0; i < suffixArray.size(); i++) {
-            if (targetCompare(suffixArray.get(i).getValue(), start, end) == 0) {
-                return i;
-            }
-        }
-        return -1;
+        int find = binarySearch(0, suffixArray.size(), start, end);
+
+        for (; find >= 0 && targetCompare(suffixArray.get(find).getValue(), start, end) == 0; find--)
+            ;
+        return find + 1;
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -215,13 +245,11 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここにコードを記述せよ
         //
+        int find = binarySearch(0, suffixArray.size(), start, end);
 
-        for (int i = suffixArray.size() - 1; i >= 0; i--) {
-            if (targetCompare(suffixArray.get(i).getValue(), start, end) == 0) {
-                return i + 1;
-            }
-        }
-        return -1;
+        for (; find < suffixArray.size() && targetCompare(suffixArray.get(find).getValue(), start, end) == 0; find++)
+            ;
+        return find;
     }
 
     // Suffix Arrayを使ったプログラムのホワイトテストは、
@@ -261,4 +289,5 @@ public class Frequencer implements FrequencerInterface {
             System.out.println("STOP");
         }
     }
+
 }
