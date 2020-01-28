@@ -167,7 +167,8 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここに比較のコードを書け
         //
-        String str_i = new String(suffix_i, StandardCharsets.UTF_8).substring(0, target_i_k.length);
+        String str_i = new String(suffix_i, StandardCharsets.UTF_8)
+                            .substring(0, Math.min(suffix_i.length, target_i_k.length));
         String str_i_k = new String(target_i_k, StandardCharsets.UTF_8);
         int result = str_i.compareTo(str_i_k);
         return result < 0 ? -1 : result > 0 ? 1 : 0;
@@ -215,7 +216,7 @@ public class Frequencer implements FrequencerInterface {
         // ここにコードを記述せよ
         //
 
-        for (int i = suffixArray.size() - 1; i > 0; i--) {
+        for (int i = suffixArray.size() - 1; i >= 0; i--) {
             if (targetCompare(suffixArray.get(i).getValue(), start, end) == 0) {
                 return i + 1;
             }
