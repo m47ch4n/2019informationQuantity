@@ -2,7 +2,7 @@ package s4.B193362; // Please modify to s4.Bnnnnnn, where nnnnnn is your student
 
 import java.lang.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*; 
+import java.util.*;
 
 import s4.specification.*;
 
@@ -24,12 +24,15 @@ public class Frequencer implements FrequencerInterface {
 
     class Suffix implements Comparable<Suffix> {
         private int value;
+
         public Suffix(int v) {
             this.value = v;
         }
-        public int compareTo(Suffix sai) { 
+
+        public int compareTo(Suffix sai) {
             return suffixCompare(this.value, sai.value);
-        } 
+        }
+
         public int getValue() {
             return this.value;
         }
@@ -86,7 +89,7 @@ public class Frequencer implements FrequencerInterface {
         String str_i = new String(suffix_i, StandardCharsets.UTF_8);
         String str_j = new String(suffix_j, StandardCharsets.UTF_8);
         int result = str_i.compareTo(str_j);
-        return result < 0 ? -1 : result > 0 ? 1 : 0;
+        return result == 0 ? 0 : result > 0 ? 1 : -1;
     }
 
     public void setSpace(byte[] space) {
@@ -103,6 +106,9 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここに、int suffixArrayをソートするコードを書け。
         // 順番はsuffixCompareで定義されるものとする。
+
+        // Java の Comparable クラスを実装した Suffix クラスで suffix_array を構成しているため、
+        // マージソートベースの O(nlog n) の Collections.sort メソッドが使用できる
         Collections.sort(suffixArray);
     }
 
@@ -133,11 +139,20 @@ public class Frequencer implements FrequencerInterface {
          * start); i++) { if(myTarget[start+i] != mySpace[offset+i]) { abort = true;
          * break; } } if(abort == false) { count++; } }
          */
-        int first = subByteStartIndex(start, end);
-        int last = subByteEndIndex(start, end);
+        if (targetReady == false)
+            return -1;
+        if (spaceReady == false)
+            return 0;
+
+        int find = binarySearch(start, end);
+        if (find == -1) {
+            return 0;
+        }
+
+        int first = subByteStartIndex(find, start, end);
+        int last = subByteEndIndex(find, start, end);
         return last - first;
     }
-    // 変更してはいけないコードはここまで。
 
     private int targetCompare(int i, int j, int k) {
         // suffixArrayを探索するときに使う比較関数。
@@ -167,14 +182,35 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここに比較のコードを書け
         //
-        String str_i = new String(suffix_i, StandardCharsets.UTF_8)
-                            .substring(0, Math.min(suffix_i.length, target_i_k.length));
+        String str_i = new String(suffix_i, StandardCharsets.UTF_8).substring(0,
+                Math.min(suffix_i.length, target_i_k.length));
         String str_i_k = new String(target_i_k, StandardCharsets.UTF_8);
         int result = str_i.compareTo(str_i_k);
-        return result < 0 ? -1 : result > 0 ? 1 : 0;
+        return result == 0 ? 0 : result > 0 ? 1 : -1;
     }
 
-    private int subByteStartIndex(int start, int end) {
+    private int binarySearch(int start, int end) {
+        return binarySearch(0, suffixArray.size() - 1, start, end);
+    }
+
+    private int binarySearch(int low, int high, int start, int end) {
+        if (high < low) {
+            return -1;
+        }
+
+        int middle = (low + high) / 2;
+        int compared = targetCompare(suffixArray.get(middle).getValue(), start, end);
+
+        if (compared == 0) {
+            return middle;
+        } else if (compared == -1) {
+            return binarySearch(middle + 1, high, start, end);
+        } else {
+            return binarySearch(low, middle - 1, start, end);
+        }
+    }
+
+    private int subByteStartIndex(int find, int start, int end) {
         // suffix arrayのなかで、目的の文字列の出現が始まる位置を求めるメソッド
         // 以下のように定義せよ。
         /*
@@ -191,15 +227,12 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここにコードを記述せよ。
         //
-        for (int i = 0; i < suffixArray.size(); i++) {
-            if (targetCompare(suffixArray.get(i).getValue(), start, end) == 0) {
-                return i;
-            }
-        }
-        return -1;
+        for (find -= 1; find >= 0 && targetCompare(suffixArray.get(find).getValue(), start, end) == 0; find--)
+            ;
+        return find + 1;
     }
 
-    private int subByteEndIndex(int start, int end) {
+    private int subByteEndIndex(int find, int start, int end) {
         // suffix arrayのなかで、目的の文字列の出現しなくなる場所を求めるメソッド
         // 以下のように定義せよ。
         /*
@@ -215,13 +248,9 @@ public class Frequencer implements FrequencerInterface {
         //
         // ここにコードを記述せよ
         //
-
-        for (int i = suffixArray.size() - 1; i >= 0; i--) {
-            if (targetCompare(suffixArray.get(i).getValue(), start, end) == 0) {
-                return i + 1;
-            }
-        }
-        return -1;
+        for (find += 1; find < suffixArray.size() && targetCompare(suffixArray.get(find).getValue(), start, end) == 0; find++)
+            ;
+        return find;
     }
 
     // Suffix Arrayを使ったプログラムのホワイトテストは、
@@ -261,4 +290,5 @@ public class Frequencer implements FrequencerInterface {
             System.out.println("STOP");
         }
     }
+
 }
