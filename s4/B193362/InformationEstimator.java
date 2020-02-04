@@ -22,6 +22,8 @@ public class InformationEstimator implements InformationEstimatorInterface {
 	byte[] mySpace; // Sample space to compute the probability
 	double[] memo;
 	FrequencerInterface myFrequencer; // Object for counting frequency
+	boolean targetReady = false;
+	boolean spaceReady = false;
 
 	byte[] subBytes(byte[] x, int start, int end) {
 		// corresponding to substring of String for byte[] ,
@@ -37,11 +39,15 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
 	public void setTarget(byte[] target) {
 		myTarget = target;
+		if (myTarget.length > 0)
+				targetReady = true;
 	}
 
 	public void setSpace(byte[] space) {
 		myFrequencer = new Frequencer();
 		mySpace = space;
+		if (mySpace.length > 0)
+				spaceReady = true;
 		myFrequencer.setSpace(space);
 	}
 
@@ -73,12 +79,18 @@ public class InformationEstimator implements InformationEstimatorInterface {
 
 
 	public double estimation() {
+		if (targetReady == false)
+				return 0.0;
+		if (spaceReady == false)
+				return Double.MAX_VALUE;
+
 		memo = new double[myTarget.length];
 		for (int i = 0; i < memo.length; i ++) {
 			memo[i] = Double.MAX_VALUE;
 		}
 
-		return iq(myTarget);
+		double result = iq(myTarget);
+		return result != Double.POSITIVE_INFINITY ? result : Double.MAX_VALUE;
 	}
 
 	public static void main(String[] args) {

@@ -144,6 +144,13 @@ public class Frequencer implements FrequencerInterface {
         if (spaceReady == false)
             return 0;
 
+        // System.out.println("- Suffix Array --------");
+        // for (int i = 0; i < suffixArray.size(); i ++) {
+        //     int compared = targetCompare(suffixArray.get(i).getValue(), start, end);
+        //     System.out.println(compared);
+        // }
+        // System.out.println("-----------------------");
+
         int find = binarySearch(start, end);
         if (find == -1) {
             return 0;
